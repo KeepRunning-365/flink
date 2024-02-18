@@ -29,12 +29,10 @@ import io.fury.ThreadSafeFury;
 import io.fury.config.CompatibleMode;
 import io.fury.config.Language;
 
-import java.io.Serializable;
-
 /**
  * 自定义序列化器.
  */
-public class FurySerializer extends Serializer<SocketWindowWordCount.WordWithCount> implements Serializable {
+public class FurySerializer extends Serializer<SocketWindowWordCount.WordWithCount> {
 
     // 建议作为一个全局变量，避免重复创建
     final Fury fury = Fury.builder()
@@ -50,7 +48,6 @@ public class FurySerializer extends Serializer<SocketWindowWordCount.WordWithCou
             // .withCompatibleMode(CompatibleMode.COMPATIBLE)
             // 开启异步多线程编译
             .withAsyncCompilation(true)
-            .requireClassRegistration(false)
             .build();
 
     ThreadSafeFury threadSafeFury = Fury.builder()
@@ -71,8 +68,7 @@ public class FurySerializer extends Serializer<SocketWindowWordCount.WordWithCou
     @Override
     public void write(Kryo kryo, Output output, SocketWindowWordCount.WordWithCount object) {
         byte[] bytes = fury.serialize(object);
-        System.out.println("自定义序列化 - 写："+bytes.length);
-        output.writeInt(bytes.length,true);
+        output.writeInt(bytes.length);
         output.writeBytes(bytes);
     }
 
@@ -81,8 +77,8 @@ public class FurySerializer extends Serializer<SocketWindowWordCount.WordWithCou
             Kryo kryo,
             Input input,
             Class<SocketWindowWordCount.WordWithCount> type) {
-        int read = input.readInt(true);
-        System.out.println("自定义序列化 - 读："+read );
+
+        int read = input.read();
         byte[] barr = new byte[read];
         input.readBytes(barr);
         return (SocketWindowWordCount.WordWithCount) fury.deserialize(barr);
