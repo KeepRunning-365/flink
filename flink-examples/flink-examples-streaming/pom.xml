@@ -36,9 +36,22 @@ under the License.
 	<!-- Allow users to pass custom jcuda versions -->
 	<properties>
 		<jcuda.version>10.0.0</jcuda.version>
+		<fury.version>0.4.1</fury.version>
 	</properties>
 
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.furyio/fury-core -->
+		<dependency>
+			<groupId>org.furyio</groupId>
+			<artifactId>fury-core</artifactId>
+			<version>${fury.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.furyio/fury-format -->
+		<dependency>
+			<groupId>org.furyio</groupId>
+			<artifactId>fury-format</artifactId>
+			<version>${fury.version}</version>
+		</dependency>
 
 		<!-- core dependencies -->
 
