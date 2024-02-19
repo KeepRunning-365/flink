@@ -18,12 +18,15 @@
 
 package org.apache.flink.streaming.examples.socket;
 
+import com.esotericsoftware.kryo.Serializer;
+
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.PipelineOptions;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
@@ -68,13 +71,13 @@ public class SocketWindowWordCount {
         // get the execution environment
 //        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         Configuration conf = new Configuration();
+
 //        conf.setString("taskmanager.memory.managed.size","0m");
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(
                 conf);
         // 禁用 kryo 进行序列化，效率低
-        env.getConfig().disableGenericTypes();
+//        env.getConfig().disableGenericTypes();
         env.getConfig().registerTypeWithKryoSerializer(WordWithCount.class, FurySerializer.class);
-//        env.getConfig().addDefaultKryoSerializer(WordWithCount.class, FurySerializer.class);
         // 打印类使用的序列化方式
         System.out.println("序列化方式：" + TypeInformation
                 .of(WordWithCount.class)
@@ -91,7 +94,8 @@ public class SocketWindowWordCount {
                                                 out.collect(new WordWithCount(word, 1L));
                                             }
                                         },
-                                Types.POJO(WordWithCount.class))
+                                TypeInformation.of(WordWithCount.class)
+                        )
                         .keyBy(value -> value.word)
                         .window(TumblingProcessingTimeWindows.of(Duration.ofSeconds(5)))
                         .reduce((a, b) -> new WordWithCount(a.word, a.count + b.count))
