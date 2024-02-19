@@ -34,7 +34,7 @@ import java.io.Serializable;
 /**
  * 自定义序列化器.
  */
-public class FurySerializer extends Serializer<SocketWindowWordCount.WordWithCount> implements Serializable {
+public class FurySerializer<T> extends Serializer<T> {
 
     // 建议作为一个全局变量，避免重复创建
     final Fury fury = Fury.builder()
@@ -69,7 +69,7 @@ public class FurySerializer extends Serializer<SocketWindowWordCount.WordWithCou
             .buildThreadSafeFury();
 
     @Override
-    public void write(Kryo kryo, Output output, SocketWindowWordCount.WordWithCount object) {
+    public void write(Kryo kryo, Output output, T object) {
         byte[] bytes = fury.serialize(object);
         System.out.println("自定义序列化 - 写："+bytes.length);
         output.writeInt(bytes.length,true);
@@ -77,14 +77,11 @@ public class FurySerializer extends Serializer<SocketWindowWordCount.WordWithCou
     }
 
     @Override
-    public SocketWindowWordCount.WordWithCount read(
-            Kryo kryo,
-            Input input,
-            Class<SocketWindowWordCount.WordWithCount> type) {
+    public T read(Kryo kryo, Input input, Class<T> type) {
         int read = input.readInt(true);
         System.out.println("自定义序列化 - 读："+read );
         byte[] barr = new byte[read];
         input.readBytes(barr);
-        return (SocketWindowWordCount.WordWithCount) fury.deserialize(barr);
+        return (T) fury.deserialize(barr);
     }
 }
