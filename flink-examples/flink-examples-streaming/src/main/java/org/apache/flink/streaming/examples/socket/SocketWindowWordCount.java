@@ -116,7 +116,8 @@ public class SocketWindowWordCount {
         public long count;
 
         @SuppressWarnings("unused")
-        public WordWithCount() {}
+//        public WordWithCount() {
+//        }
 
         public WordWithCount(String word, long count) {
             this.word = word;
